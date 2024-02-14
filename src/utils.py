@@ -10,6 +10,7 @@ import optax
 import ase
 import ase.calculators.calculator as ase_calc
 
+# MD17 Dataset hyperlinks for each molecule
 MOLECULE_CONFIG = {
   'aspirin': {
     'filename': "md17_aspirin.npz",
@@ -45,7 +46,7 @@ MOLECULE_CONFIG = {
     },
 }
 
-def prepare_datasets(filename, key, num_train=900, num_valid=100):
+def prepare_datasets(filename, key, num_train=900, num_valid=100, standardization='sub_mean'):
   # Load the dataset.
   dataset = np.load(filename)
 
@@ -61,23 +62,70 @@ def prepare_datasets(filename, key, num_train=900, num_valid=100):
   train_choice = choice[:num_train]
   valid_choice = choice[num_train:]
 
-  # Determine mean energy of the training set.
-  mean_energy = np.mean(dataset['E'][train_choice])  # ~ -97000
-
-  # Collect and return train and validation sets.
-  train_data = dict(
-    energy=jnp.asarray(dataset['E'][train_choice, 0] - mean_energy),
-    forces=jnp.asarray(dataset['F'][train_choice]),
-    atomic_numbers=jnp.asarray(dataset['z']),
-    positions=jnp.asarray(dataset['R'][train_choice]),
-  )
-  valid_data = dict(
-    energy=jnp.asarray(dataset['E'][valid_choice, 0] - mean_energy),
-    forces=jnp.asarray(dataset['F'][valid_choice]),
-    atomic_numbers=jnp.asarray(dataset['z']),
-    positions=jnp.asarray(dataset['R'][valid_choice]),
-  )
-  return train_data, valid_data, mean_energy
+  # standardize the energy
+  if standardization == 'sub_mean':
+    mean_energy = np.mean(dataset['E'][train_choice])
+    train_data = dict(
+      energy=jnp.asarray(dataset['E'][train_choice, 0] - mean_energy),
+      forces=jnp.asarray(dataset['F'][train_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][train_choice]),
+    )
+    valid_data = dict(
+      energy=jnp.asarray(dataset['E'][valid_choice, 0] - mean_energy),
+      forces=jnp.asarray(dataset['F'][valid_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][valid_choice]),
+    )
+    print("MEAN_ENERGY: ", mean_energy)
+  elif standardization == 'z_score':
+    mean_energy = np.mean(dataset['E'][train_choice])
+    std_energy = np.std(dataset['E'][train_choice])
+    train_data = dict(
+      energy=jnp.asarray((dataset['E'][train_choice, 0] - mean_energy) / std_energy),
+      forces=jnp.asarray(dataset['F'][train_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][train_choice]),
+    )
+    valid_data = dict(
+      energy=jnp.asarray((dataset['E'][valid_choice, 0] - mean_energy) / std_energy),
+      forces=jnp.asarray(dataset['F'][valid_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][valid_choice]),
+    )
+    print("MEAN_ENERGY: ", mean_energy)
+    print("STD_ENERGY: ", std_energy)
+  elif standardization == 'min_max':
+    min_energy = np.min(dataset['E'][train_choice])
+    max_energy = np.max(dataset['E'][train_choice])
+    train_data = dict(
+      energy=jnp.asarray((dataset['E'][train_choice, 0] - min_energy) / (max_energy - min_energy)),
+      forces=jnp.asarray(dataset['F'][train_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][train_choice]),
+    )
+    valid_data = dict(
+      energy=jnp.asarray((dataset['E'][valid_choice, 0] - min_energy) / (max_energy - min_energy)),
+      forces=jnp.asarray(dataset['F'][valid_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][valid_choice]),
+    )
+    print("MIN_ENERGY: ", min_energy)
+    print("MAX_ENERGY: ", max_energy)
+  else:
+    train_data = dict(
+      energy=jnp.asarray(dataset['E'][train_choice, 0]),
+      forces=jnp.asarray(dataset['F'][train_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][train_choice]),
+    )
+    valid_data = dict(
+      energy=jnp.asarray(dataset['E'][valid_choice, 0]),
+      forces=jnp.asarray(dataset['F'][valid_choice]),
+      atomic_numbers=jnp.asarray(dataset['z']),
+      positions=jnp.asarray(dataset['R'][valid_choice]),
+    )
+  return train_data, valid_data
 
 
 def prepare_batches(key, data, batch_size):

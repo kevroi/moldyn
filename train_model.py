@@ -36,7 +36,10 @@ def main(args):
   data_key, train_key = jax.random.split(jax.random.PRNGKey(0), 2)
 
   # Draw training and validation sets.
-  train_data, valid_data, _ = prepare_datasets(file_path, data_key, num_train=args.num_train, num_valid=args.num_valid)
+  train_data, valid_data = prepare_datasets(file_path, data_key,
+                                               num_train=args.num_train,
+                                               num_valid=args.num_valid,
+                                               standardization=args.std,)
 
   # Create and train model.
   message_passing_model = MessagePassingModel(
@@ -120,6 +123,12 @@ if __name__=='__main__':
         type=int, 
         default=100, 
         help='Number of validation samples'
+    )
+  parser.add_argument(
+        '--std', 
+        type=str, # set to false if we do not pass this argument
+        default='sub_mean',
+        help='Standardization technique for data pre-processing. Options: "sub_mean", "z_score", "min_max", "none"'
     )
   parser.add_argument(
         '--num_epochs', 
