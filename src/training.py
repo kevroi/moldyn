@@ -84,7 +84,7 @@ def train_model(key, model, train_data, valid_data, num_epochs, learning_rate,
               'forces_weight': forces_weight,
               }
     run = wandb.init(
-        project="Predicting Inertia Tensors", 
+        project="Predicting Molecular Dynamics", 
         config=config,
         save_code=True,
         )

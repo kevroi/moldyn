@@ -1,5 +1,6 @@
 import functools
 import os
+import shutil
 import urllib.request
 import e3x
 import flax.linen as nn
@@ -12,15 +13,24 @@ from argparse import ArgumentParser
 from src.model import MessagePassingModel
 from src.training import train_model
 from src.utils import prepare_datasets, MOLECULE_CONFIG
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning) # These appear at each epoch and are not useful for the user.
 
 
 def main(args):
   # Download the dataset
   save_dir = MOLECULE_CONFIG[args.molecule]["save_dir"]
-  file_path = "data/"+MOLECULE_CONFIG[args.molecule]["filename"]
+  filename = MOLECULE_CONFIG[args.molecule]["filename"]
+  file_path = "data/"+filename
   if not os.path.exists(file_path):
     print(f"Downloading {file_path} (this may take a while)...")
-    urllib.request.urlretrieve(f"http://www.quantum-machine.org/gdml/data/npz/{file_path}", file_path)
+    urllib.request.urlretrieve(f"http://www.quantum-machine.org/gdml/data/npz/{filename}", file_path)
+  else:
+    print(f"Dataset {file_path} already exists on your machine. Skipping download.")
+
+  # Remove any existing checkpoints
+  if os.path.exists(save_dir):
+      shutil.rmtree(save_dir)
 
   # Create PRNGKeys.
   data_key, train_key = jax.random.split(jax.random.PRNGKey(0), 2)
@@ -114,7 +124,7 @@ if __name__=='__main__':
   parser.add_argument(
         '--num_epochs', 
         type=int, 
-        default=1, 
+        default=100, 
         help='Number of epochs'
     )
   parser.add_argument(
@@ -141,3 +151,4 @@ if __name__=='__main__':
         help='Raise the flag to use wandb.'
     )
   args = parser.parse_args()
+  main(args)
