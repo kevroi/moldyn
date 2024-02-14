@@ -1,3 +1,22 @@
+# Predicting Molecular Dynamics
+
+This package contains code to train a neural network to predict molecular dynamics. The neural network is trained on a dataset of molecular dynamics trajectories.
+
+## Setup
+The current version of the package is not registered yet. To install the package, clone the repository and install the package using the following command:
+```bash
+pip install requirements.txt
+```
+
+## Usage
+To train a model, use the `train_model.py` script. The package has been designed to work with the [MD17 dataset](http://www.sgdml.org/#datasets) of molecular trajectories.
+```bash
+python train_model.py --molecule "ethanol"
+```
+
+## Results
+
+
 
 ## Extra Features
 
