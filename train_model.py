@@ -100,7 +100,7 @@ if __name__=='__main__':
         '--num_iterations', 
         type=int, 
         default=3, 
-        help='Number of iterations'
+        help='Number of times we refine features by message passing'
     )
   parser.add_argument(
         '--rad_bas',

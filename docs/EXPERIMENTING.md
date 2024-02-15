@@ -42,7 +42,7 @@ The following command line arguments can be used to modify the training process.
 - `--max_degree`: [2] The maximum degree of the polynomial to use in the radial basis function.
 - `--num_basis_functions`: [16] The number of basis functions to use in the radial basis function.
 - `--cutoff`: [5.0] The cutoff distance to use in the radial basis function. The function is 0 beyond this distance.
-- `num_iterations`: [3] The number of iterations to use in the optimizer.
+- `num_iterations`: [3] The number of message passes through the atom-wise 2 layer MLP. his gets added to the original features.
 - `forces_weight`: [1.0] The weight to use for the forces loss.
 - `--learning_rate`: [0.001] The learning rate to use in the optimizer.
 - `--num_epochs`: [100] The number of epochs to train the model for.
