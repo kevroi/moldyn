@@ -62,7 +62,7 @@ def eval_step(model_apply, batch, batch_size, forces_weight, params):
   return loss, energy_mae, forces_mae
 
 
-def train_model(key, model, train_data, valid_data, num_epochs, learning_rate,
+def train_model(cl_args, key, model, train_data, valid_data, num_epochs, learning_rate,
                 forces_weight, batch_size, use_wandb=False):
   # Initialize model parameters and optimizer state.
   key, init_key = jax.random.split(key)
@@ -78,11 +78,10 @@ def train_model(key, model, train_data, valid_data, num_epochs, learning_rate,
 
   # Setup logger if using wandb
   if use_wandb:
-    config = {'learning_rate': learning_rate,
-              'batch_size': batch_size,
-              'num_epochs': num_epochs,
-              'forces_weight': forces_weight,
-              }
+    config = dict()
+    for k, v in vars(cl_args).items():
+        if v is not None:
+            config[k] = v
     run = wandb.init(
         project="Predicting Molecular Dynamics", 
         config=config,

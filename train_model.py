@@ -51,6 +51,7 @@ def main(args):
     radial_basis_fn=RADIAL_BASIS_CONFIG[args.rad_bas],
   )
   params = train_model(
+    cl_args=args,
     key=train_key,
     model=message_passing_model,
     train_data=train_data,
