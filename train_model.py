@@ -12,7 +12,7 @@ import orbax.checkpoint
 from argparse import ArgumentParser
 from src.model import MessagePassingModel
 from src.training import train_model
-from src.utils import prepare_datasets, MOLECULE_CONFIG
+from src.utils import prepare_datasets, MOLECULE_CONFIG, RADIAL_BASIS_CONFIG
 import warnings
 warnings.simplefilter(action='ignore', category=FutureWarning) # These appear at each epoch and are not useful for the user.
 
@@ -48,6 +48,7 @@ def main(args):
     num_iterations=args.num_iterations,
     num_basis_functions=args.num_basis_functions,
     cutoff=args.cutoff,
+    radial_basis_fn=RADIAL_BASIS_CONFIG[args.rad_bas],
   )
   params = train_model(
     key=train_key,
@@ -101,6 +102,12 @@ if __name__=='__main__':
         help='Number of iterations'
     )
   parser.add_argument(
+        '--rad_bas',
+        type=str,
+        default='rec_bern',
+        help='Radial basis function to use. Options: "exp_bern", "rec_bern", "exp_cheb", "rec_cheb", "sinc"'
+  )
+  parser.add_argument(
         '--num_basis_functions', 
         type=int, 
         default=16, 
@@ -110,7 +117,7 @@ if __name__=='__main__':
         '--cutoff', 
         type=float, 
         default=5.0, 
-        help='Cutoff distance'
+        help='Radial basis functions are 0 beyond this distance'
     )
   parser.add_argument(
         '--num_train', 

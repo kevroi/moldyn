@@ -46,6 +46,14 @@ MOLECULE_CONFIG = {
     },
 }
 
+RADIAL_BASIS_CONFIG = {
+  'exp_bern': e3x.nn.exponential_bernstein,
+  'rec_bern': e3x.nn.reciprocal_bernstein,
+  'exp_cheb': e3x.nn.exponential_chebyshev,
+  'rec_cheb': e3x.nn.reciprocal_chebyshev,
+  'sinc': e3x.nn.functions.trigonometric.sinc,
+}
+
 def prepare_datasets(filename, key, num_train=900, num_valid=100, standardization='sub_mean'):
   # Load the dataset.
   dataset = np.load(filename)
