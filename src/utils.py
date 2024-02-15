@@ -57,6 +57,21 @@ RADIAL_BASIS_CONFIG = {
 }
 
 def prepare_datasets(filename, key, num_train=900, num_valid=100, standardization='sub_mean'):
+  """Prepare training and validation datasets.
+
+    Args:
+        filename (str): The filename of the dataset.
+        key (jax.random.PRNGKey): The random key.
+        num_train (int): The number of training samples. Defaults to 900.
+        num_valid (int): The number of validation samples. Defaults to 100.
+        standardization (str): The type of energy standardization to apply. Can be 'sub_mean', 'z_score', 'min_max', or None. Defaults to 'sub_mean'.
+
+    Returns:
+        tuple: A tuple containing the training and validation datasets.
+
+    Raises:
+        RuntimeError: If the dataset does not contain enough entries.
+  """
   # Load the dataset.
   dataset = np.load(filename)
 
@@ -139,6 +154,16 @@ def prepare_datasets(filename, key, num_train=900, num_valid=100, standardizatio
 
 
 def prepare_batches(key, data, batch_size):
+  """Prepare batches for training.
+
+    Args:
+        key (jax.random.PRNGKey): The random key.
+        data (dict): The data dictionary.
+        batch_size (int): The batch size.
+
+    Returns:
+        list: A list of batches.
+  """
   # Determine the number of training steps per epoch.
   data_size = len(data['energy'])
   steps_per_epoch = data_size//batch_size
@@ -173,9 +198,30 @@ def prepare_batches(key, data, batch_size):
 
 ## LOSS FUNCTIONS ##
 def mean_squared_loss(energy_prediction, energy_target, forces_prediction, forces_target, forces_weight):
+  """Calculate the mean squared loss.
+
+    Args:
+        energy_prediction: The predicted energy.
+        energy_target: The target energy.
+        forces_prediction: The predicted forces.
+        forces_target: The target forces.
+        forces_weight: The weight of the forces in the loss function.
+
+    Returns:
+        jnp.ndarray: The mean squared loss.
+  """
   energy_loss = jnp.mean(optax.l2_loss(energy_prediction, energy_target))
   forces_loss = jnp.mean(optax.l2_loss(forces_prediction, forces_target))
   return energy_loss + forces_weight * forces_loss
 
 def mean_absolute_error(prediction, target):
+  """Calculate the mean absolute error.
+
+    Args:
+        prediction: The predicted values.
+        target: The target values.
+
+    Returns:
+        jnp.ndarray: The mean absolute error.
+  """
   return jnp.mean(jnp.abs(prediction - target))
