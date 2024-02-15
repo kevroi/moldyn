@@ -51,7 +51,9 @@ RADIAL_BASIS_CONFIG = {
   'rec_bern': e3x.nn.reciprocal_bernstein,
   'exp_cheb': e3x.nn.exponential_chebyshev,
   'rec_cheb': e3x.nn.reciprocal_chebyshev,
-  'sinc': e3x.nn.functions.trigonometric.sinc,
+  'exp_gauss': e3x.nn.exponential_gaussian,
+  'rec_gauss': e3x.nn.reciprocal_gaussian,
+  'sinc': e3x.nn.sinc,
 }
 
 def prepare_datasets(filename, key, num_train=900, num_valid=100, standardization='sub_mean'):
