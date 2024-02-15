@@ -105,7 +105,7 @@ if __name__=='__main__':
         '--rad_bas',
         type=str,
         default='rec_bern',
-        help='Radial basis function to use. Options: "exp_bern", "rec_bern", "exp_cheb", "rec_cheb", "sinc"'
+        help='Radial basis function to use.'
   )
   parser.add_argument(
         '--num_basis_functions', 
