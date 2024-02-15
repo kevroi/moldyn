@@ -225,3 +225,17 @@ def mean_absolute_error(prediction, target):
         jnp.ndarray: The mean absolute error.
   """
   return jnp.mean(jnp.abs(prediction - target))
+
+def huber_loss(y_true, y_pred, delta=1.0):
+  """Calculate the huber loss.
+
+    Args:
+        y_true: The true values.
+        y_pred: The predicted values.
+        delta: The threshold for the loss function.
+
+    Returns:
+        jnp.ndarray: The huber loss.
+  """
+  residual = jnp.abs(y_true - y_pred)
+  return jnp.mean(jnp.where(residual < delta, 0.5 * jnp.square(residual), delta * (residual - 0.5 * delta)))
