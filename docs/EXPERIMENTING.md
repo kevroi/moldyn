@@ -12,10 +12,11 @@ To change the radial basis function our e3x model uses to represent displacement
 python train_model.py --molecule "benzene" --rad_bas "rec_gauss"
 ```
 
-More generally, our repo allows for large scale sweeps over various hyperparameters.
+More generally, our repo allows for large scale sweeps over various hyperparameters when using a compute cluster with a SLURM scheduler. To submit single run jobs to a SLURM scheduler, use `job-scripts/single.sh`. For big hyperparameters sweeps (i.e. grid searches), specify the hyper paremerts of interest in `job-scripts/parent.sh` and submit the parent job to the SLURM scheduler.
 ```bash
+sbatch job-scripts/parent.sh
 ```
-
+The parent job will then submit the actual jobs to the scheduler, modifying the training hyperparameters with each job. The actual job is defined in `job-scripts/child.sh`.
 
 # Full list of command line arguments
 The following command line arguments can be used to modify the training process. The default values are shown in square brackets.
