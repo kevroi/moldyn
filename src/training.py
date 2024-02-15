@@ -13,6 +13,20 @@ import wandb
 
 @functools.partial(jax.jit, static_argnames=('model_apply', 'optimizer_update', 'batch_size'))
 def train_step(model_apply, optimizer_update, batch, batch_size, forces_weight, opt_state, params):
+  """Perform a single training step.
+
+    Args:
+        model_apply (callable): The model function to apply.
+        optimizer_update (callable): The optimizer update function.
+        batch (dict): A dictionary containing the batch data.
+        batch_size (int): The batch size.
+        forces_weight (float): The weight of the forces in the loss function.
+        opt_state (optax.OptState): The optimizer state.
+        params (dict): The model parameters.
+
+    Returns:
+        Tuple: A tuple containing the updated model parameters, optimizer state, loss, energy MAE, and forces MAE.
+  """
   def loss_fn(params):
     energy, forces = model_apply(
       params,
@@ -41,6 +55,18 @@ def train_step(model_apply, optimizer_update, batch, batch_size, forces_weight, 
 
 @functools.partial(jax.jit, static_argnames=('model_apply', 'batch_size'))
 def eval_step(model_apply, batch, batch_size, forces_weight, params):
+  """Perform a single evaluation step.
+
+    Args:
+        model_apply (callable): The model function to apply.
+        batch (dict): A dictionary containing the batch data.
+        batch_size (int): The batch size.
+        forces_weight (float): The weight of the forces in the loss function.
+        params (dict): The model parameters.
+
+    Returns:
+        Tuple: A tuple containing the loss, energy MAE, and forces MAE.
+  """
   energy, forces = model_apply(
     params,
     atomic_numbers=batch['atomic_numbers'],
@@ -64,6 +90,24 @@ def eval_step(model_apply, batch, batch_size, forces_weight, params):
 
 def train_model(cl_args, key, model, train_data, valid_data, num_epochs, learning_rate,
                 forces_weight, batch_size, use_wandb=False):
+  """Train the model for predicitng molecule's force field and energy.
+
+    Args:
+        cl_args: Command-line arguments.
+        key (jax.random.PRNGKey): The random key.
+        model (nn.Module): The model to train.
+        train_data (dict): The training data.
+        valid_data (dict): The validation data.
+        num_epochs (int): The number of epochs to train for.
+        learning_rate (float): The learning rate.
+        forces_weight (float): The weight of the forces in the loss function.
+        batch_size (int): The batch size.
+        use_wandb (bool, optional): Whether to use wandb for logging. Defaults to False.
+
+    Returns:
+        dict: The trained model parameters.
+  """
+
   # Initialize model parameters and optimizer state.
   key, init_key = jax.random.split(key)
   optimizer = optax.adam(learning_rate)
