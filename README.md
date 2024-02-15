@@ -35,3 +35,6 @@ For larger jobs, such as hyperparameter sweeps, use `job-scripts/parent.sh` as f
 sbatch job-scripts/parent.sh
 ```
 This will submit a parent job to the SLURM scheduler, which will then submit the actual jobs to the scheduler, modifying the training hyperparameters with each job. The actual job is defined in `job-scripts/child.sh`.
+
+## Notes
+The initial model architecture for this package was based on the original e3x [documentation](https://e3x.readthedocs.io/stable/examples/md17_ethanol.html).
